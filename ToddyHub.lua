@@ -1,120 +1,113 @@
---[[ ToddynHub Loader v7 + Patch ]]
+--[[ ToddynHub Loader FINAL ]]
 
 _G.ToddynHubLoaded = nil
-_G.Toddynho201Loaded = nil
 
 for _, obj in ipairs(game:GetService("CoreGui"):GetChildren()) do
-    if obj.Name == "ToddynHub" or obj.Name == "ToddynhoHub201" then
-        obj:Destroy()
-    end
+    if obj.Name == "ToddynHub" then obj:Destroy() end
 end
 
 task.wait(0.3)
 
 local links = {
-    'https://gist.githubusercontent.com/wandinhozin-ship-it/75720b82be70cc7c55ea057ce58371db/raw/59f41c8001afd3140a28d146d4b129b7aa96b1ea/paste1a1fix.lua',
-    'https://gist.githubusercontent.com/wandinhozin-ship-it/447859b8f71e93d939903c4a2da7dc9d/raw/1a0415925b51dae23ec0e62ff83af5ad24bd685b/Paste1a2.lua',
-    'https://gist.githubusercontent.com/wandinhozin-ship-it/b20f0056b1da0569ddb578ca7c3dc970/raw/5f38bed9776039b04326fac74b9c82ae4cc08b5f/paste1b.lua',
-    'https://pastebin.com/raw/V1PzyDQb',
-    'https://pastebin.com/raw/usaNx6CJ',
-    'https://pastebin.com/raw/YKZqpVpC',
-    'https://pastebin.com/raw/jdGZNNfV',
-    'https://pastebin.com/raw/UTcmBeZm',
-    'https://gist.githubusercontent.com/wandinhozin-ship-it/b9c29b311c02b2ae44c15742f76ac950/raw/c1173148fbbf0a88ad8ef6ac8a9287c38cb3640b/paste7.lua',
-    'https://pastebin.com/raw/CkFKBhmS',
-    'https://pastebin.com/raw/jrbpiJhs',
-    'https://pastebin.com/raw/CEgNcQhx',
-    'https://pastebin.com/raw/HAPUdLQF',
-    'https://pastebin.com/raw/cwaPzq3F',
-    'https://gist.githubusercontent.com/wandinhozin-ship-it/172a788aa667c0d105f73f2fcc19257f/raw/922359ce57dd24387641a1561d11c4a923e6aca1/12a1.lua',
-    'https://gist.githubusercontent.com/wandinhozin-ship-it/d1949357d78a0d6fb6d18c2f298a81c5/raw/ac3a4a3ed04b3a05ca2edee537230b71f4127d0f/12a2.lua',
-    'https://gist.githubusercontent.com/wandinhozin-ship-it/172286377b9ba2bc402f20a14aea8965/raw/70914f055ce9eaacd087d606037411759952c5a3/12a3.lua',
-    'https://gist.githubusercontent.com/wandinhozin-ship-it/31135c9ae2b8228a455e1650e7ea4b0f/raw/ea7af368e557579fa2587414394fc3875ba95d9e/12a4.lua',
+    'https://gist.githubusercontent.com/wandinhozin-ship-it/605a460ba68b3a1b3eb1c25fb9eb006f/raw/78c4a68489421f8fff69066a3f0744501545e747/p1.lua',
+    'https://gist.githubusercontent.com/wandinhozin-ship-it/af8a8c5f3cfc5668db60a73e99a0768f/raw/436054e93c7a35419cc8f41bd7e7081028122ef9/P2.lua',
+    'https://gist.githubusercontent.com/wandinhozin-ship-it/1eab38c548a580b808399a15f8eb4661/raw/6c3507f3f7e0801d7281bbd539ae91f753ba1598/p3.lua',
+    'https://gist.githubusercontent.com/wandinhozin-ship-it/9a3844fe5f30fc900ce8548bec092159/raw/7b68de361cc02c7975dfbd1a5b0704667069ab59/p4.lua',
+    'https://gist.githubusercontent.com/wandinhozin-ship-it/de9c00b631c74aedaa41f6c7a017b87b/raw/3576e281d5935733bff6245900471f0ad395b5c1/p5.lua',
+    'https://gist.githubusercontent.com/wandinhozin-ship-it/6438c001232bb3ef2489a221225c9b04/raw/1303ea3294fe88e2e99c736296334bbdbf4ce008/p6.lua',
+    'https://gist.githubusercontent.com/wandinhozin-ship-it/8a37abde0d4828199b0abc6a8f84afee/raw/b1705265b4ccb41237cbc368346c3186ecb51cf7/p7.lua',
 }
 
-local total = ''
+-- Ambiente compartilhado entre todos os pastes
+local env = setmetatable({}, { __index = _G })
+
 for i, url in ipairs(links) do
     local ok, c = pcall(function() return game:HttpGet(url) end)
-    if ok and c then total = total .. c .. '\n' end
+    if ok and c then
+        local f, err = loadstring(c)
+        if f then
+            setfenv(f, env)
+            local ok2, err2 = pcall(f)
+            if not ok2 then
+                print("Erro paste " .. i .. ": " .. tostring(err2))
+            end
+        else
+            print("Compile erro " .. i .. ": " .. tostring(err))
+        end
+    end
     task.wait(0.1)
 end
 
--- Converte "local function" top-level em global (libera registradores)
-local resultado = {}
-for linha in total:gmatch("([^\n]*)") do
-    if linha:match("^local%s+function%s+") then
-        linha = linha:gsub("^local%s+function%s+", "function ")
-    end
-    table.insert(resultado, linha)
-end
-total = table.concat(resultado, "\n")
+-- PATCH: Window:Notify se faltar
+if env.Window and not env.Window.Notify then
+    env.Window.Notify = function(self, title, desc, duration)
+        local SG = env.ScreenGui
+        local TH = env.Theme
+        local newF = env.new
+        local cornerF = env.corner
+        local strokeF = env.stroke
 
-local f, err = loadstring(total)
-if not f then
-    game:GetService("StarterGui"):SetCore("SendNotification", {
-        Title = "❌ Compile error", Text = tostring(err):sub(1, 140), Duration = 20,
-    })
-    return
-end
-
-local ok, err2 = pcall(f)
-if not ok then
-    game:GetService("StarterGui"):SetCore("SendNotification", {
-        Title = "❌ Runtime error", Text = tostring(err2):sub(1, 140), Duration = 20,
-    })
-    return
-end
-
--- ⚡ PATCH: Redimensiona + ativa scroll + compacta componentes
-task.wait(1)
-
-local hubGui
-for _, obj in ipairs(game:GetService("CoreGui"):GetChildren()) do
-    if obj.Name == "ToddynHub" then hubGui = obj break end
-end
-
-if hubGui then
-    local mainFrame = hubGui:FindFirstChild("MainFrame")
-    if mainFrame then
-        local vp = workspace.CurrentCamera.ViewportSize
-        local w = math.min(vp.X - 15, 480)
-        local h = math.min(vp.Y - 80, 400)
-        mainFrame.Size = UDim2.fromOffset(w, h)
-        mainFrame.Position = UDim2.new(0.5, -w/2, 0.5, -h/2)
-        
-        local tabBar = mainFrame:FindFirstChild("TabBar")
-        local content = mainFrame:FindFirstChild("Content")
-        if tabBar and content then
-            local tabW = math.min(90, w * 0.20)
-            tabBar.Size = UDim2.new(0, tabW, 1, -58)
-            tabBar.Position = UDim2.fromOffset(6, 50)
-            content.Size = UDim2.new(1, -(tabW + 16), 1, -62)
-            content.Position = UDim2.fromOffset(tabW + 10, 54)
+        local nh = SG:FindFirstChild("NotifyHolder")
+        if not nh then
+            nh = newF("Frame", {
+                Name = "NotifyHolder",
+                Size = UDim2.fromOffset(260, 400),
+                Position = UDim2.new(1, -280, 0, 60),
+                BackgroundTransparency = 1,
+                Parent = SG,
+            })
+            newF("UIListLayout", {
+                Padding = UDim.new(0, 8),
+                VerticalAlignment = Enum.VerticalAlignment.Top,
+                HorizontalAlignment = Enum.HorizontalAlignment.Right,
+                SortOrder = Enum.SortOrder.LayoutOrder,
+                Parent = nh,
+            })
         end
-    end
 
-    for _, obj in ipairs(hubGui:GetDescendants()) do
-        if obj:IsA("ScrollingFrame") then
-            obj.ScrollBarThickness = 6
-            obj.ScrollBarImageColor3 = Color3.fromRGB(200, 140, 255)
-            obj.ScrollingEnabled = true
-            obj.AutomaticCanvasSize = Enum.AutomaticSize.Y
-            obj.CanvasSize = UDim2.new(0, 0, 0, 0)
-            obj.ElasticBehavior = Enum.ElasticBehavior.Never
-        end
-        if obj:IsA("Frame") and obj.Parent and obj.Parent:IsA("ScrollingFrame") then
-            local y = obj.Size.Y.Offset
-            if y == 50 then obj.Size = UDim2.new(1, 0, 0, 40)
-            elseif y == 60 then obj.Size = UDim2.new(1, 0, 0, 48)
-            elseif y == 44 then obj.Size = UDim2.new(1, 0, 0, 38)
-            elseif y == 26 then obj.Size = UDim2.new(1, 0, 0, 22)
+        local n = newF("Frame", {
+            Size = UDim2.new(1, 0, 0, 55),
+            BackgroundColor3 = TH.Surface,
+            BorderSizePixel = 0,
+            Parent = nh,
+        })
+        cornerF(n, 8)
+        strokeF(n, TH.Accent, 1)
+        newF("TextLabel", {
+            Size = UDim2.new(1, -16, 0, 18),
+            Position = UDim2.fromOffset(12, 8),
+            BackgroundTransparency = 1,
+            Text = title or "Aviso",
+            TextColor3 = TH.Text, TextSize = 13,
+            Font = Enum.Font.GothamBold,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            Parent = n,
+        })
+        newF("TextLabel", {
+            Size = UDim2.new(1, -16, 0, 16),
+            Position = UDim2.fromOffset(12, 28),
+            BackgroundTransparency = 1,
+            Text = desc or "",
+            TextColor3 = TH.TextDim, TextSize = 11,
+            Font = Enum.Font.Gotham,
+            TextXAlignment = Enum.TextXAlignment.Left,
+            TextWrapped = true,
+            Parent = n,
+        })
+        task.delay(duration or 3, function()
+            if n and n.Parent then
+                for j = 0, 10 do
+                    if n.Parent then n.BackgroundTransparency = j / 10 end
+                    task.wait(0.02)
+                end
+                if n.Parent then n:Destroy() end
             end
-        end
+        end)
     end
 end
 
 game:GetService("StarterGui"):SetCore("SendNotification", {
-    Title = "✅ ToddynHub carregado",
-    Text = "UI ajustada + scroll ativo",
+    Title = "ToddynHub",
+    Text = "Carregado! Toggles devem funcionar",
     Duration = 8,
 })
