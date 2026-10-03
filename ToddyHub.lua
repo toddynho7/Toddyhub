@@ -1,8 +1,8 @@
 --[[ ToddynHub - Loader Final ]]
 
 _G.ToddynHubLoaded = nil
+_G.ToddynHubToggleSet = nil
 
--- Limpa instâncias antigas
 local function limpar()
     local locais = { game:GetService("CoreGui") }
     if gethui then table.insert(locais, gethui()) end
@@ -25,10 +25,13 @@ limpar()
 task.wait(0.3)
 
 local links = {
-    'https://gist.githubusercontent.com/wandinhozin-ship-it/e97b35e08485575e31a5b4e7d10b79a3/raw/0f4314a4698aa07eb6cb19faed5b9a115e3ac842/t1.lua', -- Parte 1: Base + UI
-    'https://gist.githubusercontent.com/wandinhozin-ship-it/c070c993fe57b15311404ab4320de653/raw/274f573a06e40426fe2af64cb50ba8ef9c4bb134/t1.lua', -- Parte 2: Murder/Sheriff/Innocent
-    'https://gist.githubusercontent.com/wandinhozin-ship-it/55218d591ddd12e1f721ab37008c87c4/raw/f8a0e4632863281575297bdd02c6565a4af24f78/t3.lua', -- Parte 3: Utility/Local/Farm
-    'https://gist.githubusercontent.com/wandinhozin-ship-it/58becd71fbfa8432429242baeaf05f05/raw/eee69f7e569f5b8b7ef74533090602f0c6b536ed/t4.lua', -- Parte 4: ESP/Visuals/Settings/Final
+    'https://gist.githubusercontent.com/wandinhozin-ship-it/8c2524dfbd6d3f62098462a1c968e136/raw/fc127952ebff1ab28584cb3e99e3328c0fa81fc7/t1.lua',   -- Base + UI
+    'https://gist.githubusercontent.com/wandinhozin-ship-it/f4c46e4bdbfefd438e7b2105571b618b/raw/d7146f83cf5a3b4feb726075ae8875ba2e340e5a/t1b.lua',  -- AddColorPicker
+    'https://gist.githubusercontent.com/wandinhozin-ship-it/3d05260726dba317b04789a9bdabab20/raw/355aebd4183d0ce4608da62fbe1cda72728a1f28/t2a.lua',  -- Murder
+    'https://gist.githubusercontent.com/wandinhozin-ship-it/928bd69ed60567854906933d509e8f30/raw/b728462e04a42ea9f8a8475232d0549ce655fdcb/t2b.lua',  -- Sheriff + Innocent
+    'https://gist.githubusercontent.com/wandinhozin-ship-it/55218d591ddd12e1f721ab37008c87c4/raw/f8a0e4632863281575297bdd02c6565a4af24f78/t3.lua',   -- Utility + Local + Farm
+    'https://gist.githubusercontent.com/wandinhozin-ship-it/740c7a1c662049cbd6076fb68bb41d20/raw/3fc3e1a0579dda4a6657ef3accb7c57e8edddc0a/t4a.lua',  -- ESP
+    'https://gist.githubusercontent.com/wandinhozin-ship-it/5fde5f48fbd6a860bf3bf570ab64223e/raw/3844d6444b5934c4036ce11f112115bb7aa3423a/t4b.lua',  -- Aura + Kill Effect + Settings + Final
 }
 
 for i, url in ipairs(links) do
@@ -39,21 +42,26 @@ for i, url in ipairs(links) do
             local ok2, err2 = pcall(f)
             if not ok2 then
                 print("Erro paste " .. i .. ": " .. tostring(err2))
+                game:GetService("StarterGui"):SetCore("SendNotification", {
+                    Title = "Erro " .. i,
+                    Text = tostring(err2):sub(1, 130),
+                    Duration = 15,
+                })
             end
         else
             print("Compile erro " .. i .. ": " .. tostring(err))
+            game:GetService("StarterGui"):SetCore("SendNotification", {
+                Title = "Compile " .. i,
+                Text = tostring(err):sub(1, 130),
+                Duration = 15,
+            })
         end
-    else
-        print("Download falhou: " .. i)
     end
     task.wait(0.1)
 end
 
 task.wait(1)
 
--- ═══════════════════════════════
--- PATCH: Procura o ScreenGui em qualquer lugar
--- ═══════════════════════════════
 local function acharHubGui()
     local locais = { game:GetService("CoreGui") }
     if gethui then table.insert(locais, gethui()) end
@@ -71,21 +79,13 @@ local function acharHubGui()
 end
 
 local hubGui = acharHubGui()
-if not hubGui then
-    game:GetService("StarterGui"):SetCore("SendNotification", {
-        Title = "ToddynHub", Text = "Erro: janela nao criada", Duration = 10,
-    })
-    return
-end
+if not hubGui then return end
 
 local mainFrame = hubGui:FindFirstChild("MainFrame")
 if not mainFrame then return end
 
 local UIS = game:GetService("UserInputService")
 
--- ═══════════════════════════════
--- PATCH 1: Redimensionar + ajustar TabBar
--- ═══════════════════════════════
 local vp = workspace.CurrentCamera.ViewportSize
 local w = math.min(vp.X - 20, 460)
 local h = math.min(vp.Y - 100, 360)
@@ -104,9 +104,6 @@ if tabBar and content then
     content.Position = UDim2.fromOffset(tabW + 12, 50)
 end
 
--- ═══════════════════════════════
--- PATCH 2: Scroll em todas as abas
--- ═══════════════════════════════
 for _, obj in ipairs(hubGui:GetDescendants()) do
     if obj:IsA("ScrollingFrame") then
         obj.CanvasSize = UDim2.new(0, 0, 0, 0)
@@ -121,9 +118,6 @@ for _, obj in ipairs(hubGui:GetDescendants()) do
     end
 end
 
--- ═══════════════════════════════
--- PATCH 3: Drag na janela
--- ═══════════════════════════════
 local titleBar = mainFrame:FindFirstChild("TitleBar")
 if titleBar then
     titleBar.Active = true
@@ -154,19 +148,12 @@ if titleBar then
     end)
 end
 
--- ═══════════════════════════════
--- PATCH 4: Botão anime (drag + abrir/fechar)
--- ═══════════════════════════════
 local toggleBtn = hubGui:FindFirstChild("MenuToggle")
-if toggleBtn then
+if toggleBtn and not _G.ToddynHubToggleSet then
+    _G.ToddynHubToggleSet = true
     local menuOpen = true
     local dragToggle = false
     local dragToggleStart, dragTogglePos
-
-    -- Remove conexões antigas de clique
-    for _, conn in ipairs(getconnections(toggleBtn.MouseButton1Click)) do
-        pcall(function() conn:Disconnect() end)
-    end
 
     toggleBtn.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1
@@ -207,6 +194,6 @@ end
 
 game:GetService("StarterGui"):SetCore("SendNotification", {
     Title = "ToddynHub",
-    Text = "Carregado! Panic: END",
+    Text = "Carregado!",
     Duration = 6,
 })
