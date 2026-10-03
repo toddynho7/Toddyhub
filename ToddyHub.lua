@@ -1,33 +1,20 @@
 --[[
-    ToddynHub - Loader v2
-    Baixa as 12 partes do Pastebin e executa
+    ToddynHub - Loader
 ]]
 
 local links = {
-    -- 1: Base + Janela + Watermark
-    'https://pastebin.com/raw/sC36W60v',
-    -- 2: AddTab/Section/Toggle/Button
-    'https://pastebin.com/raw/V1PzyDQb',
-    -- 3: Slider/Dropdown
-    'https://pastebin.com/raw/usaNx6CJ',
-    -- 4: ColorPicker/Keybind
-    'https://pastebin.com/raw/YKZqpVpC',
-    -- 5: Config + Abas novas + Settings Instagram
-    'https://pastebin.com/raw/jdGZNNfV',
-    -- 6: Murder + Kill Aura
-    'https://pastebin.com/raw/UTcmBeZm',
-    -- 7: Sheriff + Botao Anime
-    'https://pastebin.com/raw/prTiXBx6',
-    -- 8: Innocent + Utilitarios (Fling/Noclip/ServerHop)
-    'https://pastebin.com/raw/CkFKBhmS',
-    -- 9: Anti-Fling + Void Hide + Modifiers
-    'https://pastebin.com/raw/jrbpiJhs',
-    -- 10A: Aura + Kill Effect
-    'https://pastebin.com/raw/CEgNcQhx',
-    -- 10B: ESP (aba propria)
-    'https://pastebin.com/raw/HAPUdLQF',
-    -- 10C: Minimap + Farm + Botao Menu + Final
-    'https://pastebin.com/raw/xYxTQW9s',
+    'https://pastebin.com/raw/jpjhAMRq', -- 1 (corrigido)
+    'https://pastebin.com/raw/V1PzyDQb', -- 2
+    'https://pastebin.com/raw/usaNx6CJ', -- 3
+    'https://pastebin.com/raw/YKZqpVpC', -- 4
+    'https://pastebin.com/raw/jdGZNNfV', -- 5
+    'https://pastebin.com/raw/UTcmBeZm', -- 6
+    'https://pastebin.com/raw/prTiXBx6', -- 7
+    'https://pastebin.com/raw/CkFKBhmS', -- 8
+    'https://pastebin.com/raw/jrbpiJhs', -- 9
+    'https://pastebin.com/raw/CEgNcQhx', -- 10A
+    'https://pastebin.com/raw/HAPUdLQF', -- 10B
+    'https://pastebin.com/raw/xYxTQW9s', -- 10C
 }
 
 local codigo = ''
@@ -35,11 +22,11 @@ for i, url in ipairs(links) do
     local ok, parte = pcall(function() return game:HttpGet(url) end)
     if ok and parte then
         codigo = codigo .. parte .. '\n'
-        print('✅ Parte ' .. i .. ': ' .. #parte .. ' chars')
+        print('OK ' .. i .. ': ' .. #parte .. ' chars')
     else
-        warn('❌ Falha na parte ' .. i .. ': ' .. url)
+        warn('FALHA ' .. i .. ': ' .. url)
     end
 end
 
-print('📦 Total: ' .. #codigo .. ' caracteres')
+print('Total: ' .. #codigo)
 loadstring(codigo)()
