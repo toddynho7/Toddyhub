@@ -25,13 +25,13 @@ limpar()
 task.wait(0.3)
 
 local links = {
-    'https://gist.githubusercontent.com/wandinhozin-ship-it/8c2524dfbd6d3f62098462a1c968e136/raw/fc127952ebff1ab28584cb3e99e3328c0fa81fc7/t1.lua',   -- Base + UI
-    'https://gist.githubusercontent.com/wandinhozin-ship-it/f4c46e4bdbfefd438e7b2105571b618b/raw/d7146f83cf5a3b4feb726075ae8875ba2e340e5a/t1b.lua',  -- AddColorPicker
-    'https://gist.githubusercontent.com/wandinhozin-ship-it/3d05260726dba317b04789a9bdabab20/raw/355aebd4183d0ce4608da62fbe1cda72728a1f28/t2a.lua',  -- Murder
-    'https://gist.githubusercontent.com/wandinhozin-ship-it/928bd69ed60567854906933d509e8f30/raw/b728462e04a42ea9f8a8475232d0549ce655fdcb/t2b.lua',  -- Sheriff + Innocent
-    'https://gist.githubusercontent.com/wandinhozin-ship-it/55218d591ddd12e1f721ab37008c87c4/raw/f8a0e4632863281575297bdd02c6565a4af24f78/t3.lua',   -- Utility + Local + Farm
-    'https://gist.githubusercontent.com/wandinhozin-ship-it/740c7a1c662049cbd6076fb68bb41d20/raw/3fc3e1a0579dda4a6657ef3accb7c57e8edddc0a/t4a.lua',  -- ESP
-    'https://gist.githubusercontent.com/wandinhozin-ship-it/5fde5f48fbd6a860bf3bf570ab64223e/raw/3844d6444b5934c4036ce11f112115bb7aa3423a/t4b.lua',  -- Aura + Kill Effect + Settings + Final
+    'https://gist.githubusercontent.com/toddynho7/8c2524dfbd6d3f62098462a1c968e136/raw/fc127952ebff1ab28584cb3e99e3328c0fa81fc7/t1.lua',
+    'https://gist.githubusercontent.com/toddynho7/f4c46e4bdbfefd438e7b2105571b618b/raw/d7146f83cf5a3b4feb726075ae8875ba2e340e5a/t1b.lua',
+    'https://gist.githubusercontent.com/toddynho7/3d05260726dba317b04789a9bdabab20/raw/355aebd4183d0ce4608da62fbe1cda72728a1f28/t2a.lua',
+    'https://gist.githubusercontent.com/toddynho7/1285658cf5ee018f55e8b8021d542025/raw/0e337fc25208d84a861ee5073723c1dbba30836a/t2b.lua',
+    'https://gist.githubusercontent.com/toddynho7/55218d591ddd12e1f721ab37008c87c4/raw/f8a0e4632863281575297bdd02c6565a4af24f78/t3.lua',
+    'https://gist.githubusercontent.com/toddynho7/740c7a1c662049cbd6076fb68bb41d20/raw/3fc3e1a0579dda4a6657ef3accb7c57e8edddc0a/t4a.lua',
+    'https://gist.githubusercontent.com/toddynho7/5fde5f48fbd6a860bf3bf570ab64223e/raw/3844d6444b5934c4036ce11f112115bb7aa3423a/t4b.lua',
 }
 
 for i, url in ipairs(links) do
